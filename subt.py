@@ -6,7 +6,7 @@ import subprocess
 import yaml
 from colorama import init, Fore, Style
 
-init(autoreset=True)  # Inisialisasi colorama untuk manajemen warna terminal
+init(autoreset=True)  # Initialize colorama for terminal color management
 
 def load_vulnerable_domains():
     vulnerable_domains = []
@@ -25,7 +25,7 @@ def load_vulnerable_domains():
                 except yaml.YAMLError as e:
                     print(f"Error reading {filename}: {e}")
 
-    # Menambahkan entri dinamis
+    # Add dynamic entry
     vulnerable_domains.append({'cname': 'github.io', 'status_code': 404, 'status': 'vulnerable can be takeover!'})
     
     return vulnerable_domains
@@ -45,7 +45,7 @@ def subfinder_scan(domain):
 
 def check_subdomain(subdomain):
     try:
-        # Gunakan dig untuk mendapatkan CNAME
+        # Use dig to get CNAME
         dig_process = subprocess.Popen(['dig', subdomain, '+short', 'CNAME'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         dig_output, dig_error = dig_process.communicate()
         if dig_process.returncode != 0:
@@ -54,7 +54,7 @@ def check_subdomain(subdomain):
 
         dig_output = dig_output.decode('utf-8').strip()
 
-        # Gunakan curl untuk mendapatkan status code
+        # Use curl to get status code
         curl_process = subprocess.Popen(['curl', '-s', '-o', '/dev/null', '-I', '-w', '%{http_code}', f'http://{subdomain}'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         curl_output, curl_error = curl_process.communicate()
         if curl_process.returncode != 0:
@@ -63,7 +63,7 @@ def check_subdomain(subdomain):
 
         curl_output = curl_output.decode('utf-8').strip()
 
-        # Dapatkan informasi yang dibutuhkan
+        # Get needed information
         cname = dig_output if dig_output else None
         status_code = int(curl_output) if curl_output.isdigit() else 0
 
@@ -76,7 +76,7 @@ def main(input, listdomains=False, direct_subdomains=False):
     start_time = time.time()
     vulnerable_domains = load_vulnerable_domains()
 
-    # Logo SubT
+    # SubT logo
     print(Fore.BLUE + r'''
 ██████████████████████████
 █─▄▄▄▄█▄─██─▄█▄─▄─▀█─▄─▄─█
@@ -108,7 +108,7 @@ Author by Van | Tegalsec
                                 found_vulnerable = True
                                 is_vulnerable = True
                                 break
-                            # Cek untuk CNAME dinamis
+                            # Check for dynamic CNAME
                             elif '*' in domain_info['cname'] and domain_info['cname'].replace('*', '') in cname and domain_info['status_code'] == status_code:
                                 print(Fore.RED + f"{subdomain} [{status_code}] | {domain_info['status']} [{domain_info['cname']}]" + Style.RESET_ALL)
                                 found_vulnerable = True
@@ -138,7 +138,7 @@ Author by Van | Tegalsec
                             found_vulnerable = True
                             is_vulnerable = True
                             break
-                        # Cek untuk CNAME dinamis
+                        # Check for dynamic CNAME
                         elif '*' in domain_info['cname'] and domain_info['cname'].replace('*', '') in cname and domain_info['status_code'] == status_code:
                             print(Fore.RED + f"{subdomain} [{status_code}] | {domain_info['status']} [{domain_info['cname']}]" + Style.RESET_ALL)
                             found_vulnerable = True
@@ -171,7 +171,7 @@ Author by Van | Tegalsec
                             found_vulnerable = True
                             is_vulnerable = True
                             break
-                        # Cek untuk CNAME dinamis
+                        # Check for dynamic CNAME
                         elif '*' in domain_info['cname'] and domain_info['cname'].replace('*', '') in cname and domain_info['status_code'] == status_code:
                             print(Fore.RED + f"{subdomain} [{status_code}] | {domain_info['status']} [{domain_info['cname']}]" + Style.RESET_ALL)
                             found_vulnerable = True
